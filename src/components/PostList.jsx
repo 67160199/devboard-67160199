@@ -8,23 +8,27 @@ function PostList({ favorites, onToggleFavorite }) {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("https://jsonplaceholder.typicode.com/posts");
-        if (!res.ok) throw new Error("ดึงข้อมูลไม่สำเร็จ");
-        const data = await res.json();
-        setPosts(data.slice(0, 20)); // เอาแค่ 20 รายการแรก
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchPosts() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+
+      if (!res.ok) throw new Error("ดึงข้อมูลไม่สำเร็จ");
+
+      const data = await res.json();
+      setPosts(data.slice(0, 20));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     fetchPosts();
-  }, []); // [] = ทำครั้งเดียวตอน component mount
+  }, []);
 
   const filtered = posts.filter((post) =>
     post.title.toLowerCase().includes(search.toLowerCase()),
@@ -49,15 +53,37 @@ function PostList({ favorites, onToggleFavorite }) {
 
   return (
     <div>
-      <h2
+      <div
         style={{
-          color: "#2d3748",
-          borderBottom: "2px solid #1e40af",
-          paddingBottom: "0.5rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        โพสต์ล่าสุด
-      </h2>
+        <h2
+          style={{
+            color: "#2d3748",
+            borderBottom: "2px solid #1e40af",
+            paddingBottom: "0.5rem",
+          }}
+        >
+          โพสต์ล่าสุด
+        </h2>
+
+        <button
+          onClick={fetchPosts}
+          style={{
+            background: "#1e40af",
+            color: "white",
+            border: "none",
+            padding: "0.4rem 0.8rem",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          🔄 โหลดใหม่
+        </button>
+      </div>
 
       <input
         type="text"
