@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PostCard from "./PostCard";
+import PostCount from "./PostCount";
 import LoadingSpinner from "./LoadingSpinner";
 
 function PostList({ favorites, onToggleFavorite }) {
@@ -8,13 +9,12 @@ function PostList({ favorites, onToggleFavorite }) {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
 
+  // 🔥 แยก logic fetch ออกมา
   async function fetchPosts() {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch("https://jsonplaceholder.typicode.com/posts");
-
       if (!res.ok) throw new Error("ดึงข้อมูลไม่สำเร็จ");
 
       const data = await res.json();
@@ -26,6 +26,7 @@ function PostList({ favorites, onToggleFavorite }) {
     }
   }
 
+  // โหลดครั้งแรก
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -53,6 +54,7 @@ function PostList({ favorites, onToggleFavorite }) {
 
   return (
     <div>
+      {/* 🔥 Header + ปุ่มโหลดใหม่ */}
       <div
         style={{
           display: "flex",
@@ -69,21 +71,22 @@ function PostList({ favorites, onToggleFavorite }) {
         >
           โพสต์ล่าสุด
         </h2>
-
         <button
           onClick={fetchPosts}
           style={{
-            background: "#1e40af",
-            color: "white",
-            border: "none",
             padding: "0.4rem 0.8rem",
             borderRadius: "6px",
+            border: "none",
+            background: "#1e40af",
+            color: "white",
             cursor: "pointer",
           }}
         >
           🔄 โหลดใหม่
         </button>
       </div>
+      {/* แสดงจำนวนโพสต์ทั้งหมด */}
+      <PostCount count={posts.length} />
 
       <input
         type="text"
@@ -108,12 +111,7 @@ function PostList({ favorites, onToggleFavorite }) {
       )}
 
       {filtered.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          isFavorite={favorites.includes(post.id)}
-          onToggleFavorite={() => onToggleFavorite(post.id)}
-        />
+        <PostCard key={post.id} post={post} />
       ))}
     </div>
   );
